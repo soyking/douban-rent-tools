@@ -5,6 +5,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"strconv"
 	"time"
+	"strings"
 )
 
 type Topic struct {
@@ -14,6 +15,7 @@ type Topic struct {
 	Author        string
 	Reply         int
 	LastReplyTime time.Time
+	TopicContent  *TopicContent
 }
 
 // 从文档树中获取 Topic
@@ -24,13 +26,14 @@ func GetTopics(doc *goquery.Document) ([]*Topic, error) {
 		Each(func(i int, s *goquery.Selection) {
 			topic, err := GetTopic(s)
 			if err != nil {
-				outErr = err
+				outErr = errors.New("group: " + doc.Url.String() + " #" + strconv.Itoa(i) + "; " + err.Error())
 			}
 
 			if topic != nil {
 				topics = append(topics, topic)
 			}
-		})
+		},
+		)
 	return topics, outErr
 }
 
@@ -49,28 +52,34 @@ func GetTopic(s *goquery.Selection) (*Topic, error) {
 	titleBlock = titleBlock.Find("a")
 	url, exist := titleBlock.Attr("href")
 	if !exist {
-		return nil, errors.New("without url, " + s.Text())
+		return nil, errors.New("without url")
 	}
+	topicContent, err := GetTopicContent(url)
+	if err != nil {
+		if strings.Contains(err.Error(), ErrorTopicDelete.Error()) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
 	title := titleBlock.Text()
 	if title == "" {
-		return nil, errors.New("without title, " + s.Text())
+		return nil, errors.New("without title")
 	}
 
 	authorBlock = authorBlock.Find("a")
 	authorURL, exist := authorBlock.Attr("href")
 	if !exist {
-		return nil, errors.New("without author url, " + s.Text())
+		return nil, errors.New("without author url")
 	}
 	author := authorBlock.Text()
 	if author == "" {
-		return nil, errors.New("without author, " + s.Text())
+		return nil, errors.New("without author")
 	}
 
 	replyStr := replyBlock.Text()
-	var reply int
-	if replyStr == "" {
-		reply = 0
-	} else {
+	reply := 0
+	if replyStr != "" {
 		var err error
 		reply, err = strconv.Atoi(replyStr)
 		if err != nil {
@@ -80,7 +89,7 @@ func GetTopic(s *goquery.Selection) (*Topic, error) {
 
 	replyTimeStr := timeBlock.Text()
 	if replyTimeStr == "" {
-		return nil, errors.New("without last reply time, " + s.Text())
+		return nil, errors.New("without last reply time")
 	}
 	// 时间格式是 08-31 23:42 加上当前年份方便解析成 time.Time
 	lastReplyTime, err := time.Parse("2006-01-02 15:04", strconv.Itoa(time.Now().Year())+"-"+replyTimeStr)
@@ -95,5 +104,6 @@ func GetTopic(s *goquery.Selection) (*Topic, error) {
 		Author:        author,
 		Reply:         reply,
 		LastReplyTime: lastReplyTime,
+		TopicContent:  topicContent,
 	}, nil
 }
