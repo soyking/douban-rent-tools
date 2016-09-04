@@ -2,7 +2,7 @@ package group
 
 import (
 	"errors"
-	"regexp"
+	"github.com/PuerkitoBio/goquery"
 	"strconv"
 	"time"
 )
@@ -16,60 +16,83 @@ type Topic struct {
 	LastReplyTime time.Time
 }
 
-// 从网页内容获取 Topic
-func GetTopics(content []byte) ([]*Topic, error) {
-	r, err := regexp.Compile(`<tr class="">([\w\W]*?)</tr>`)
-	if err != nil {
-		return nil, err
-	}
+// 从文档树中获取 Topic
+func GetTopics(doc *goquery.Document) ([]*Topic, error) {
+	var topics []*Topic
+	var outErr error
+	doc.Find("html body #wrapper div#content div.grid-16-8.clearfix div.article div table.olt tbody tr").
+		Each(func(i int, s *goquery.Selection) {
+			topic, err := GetTopic(s)
+			if err != nil {
+				outErr = err
+			}
 
-	rets := r.FindAllSubmatch(content, -1)
-	topics := []*Topic{}
-	for i := range rets {
-		t, err := GetTopic(rets[i][1])
-		if err != nil {
-			return nil, err
-		}
-		topics = append(topics, t)
-	}
-
-	return topics, nil
+			if topic != nil {
+				topics = append(topics, topic)
+			}
+		})
+	return topics, outErr
 }
 
-// 解析出每个片段中的 Topic
-func GetTopic(topicContent []byte) (*Topic, error) {
-	r, err := regexp.Compile(`<a href="(.*?)" title="(.*?)"([\w\W]*?)<a href="(.*?)" class="">(.*?)</a>([\w\W]*?)<td nowrap="nowrap" class="">([0-9]*?)</td>([\w\W]*?)<td nowrap="nowrap" class="time">(.*?)</td>`)
-	if err != nil {
-		return nil, err
+// 解析成自定义的 Topic
+func GetTopic(s *goquery.Selection) (*Topic, error) {
+	titleBlock := s.Find("td.title")
+	if titleBlock.Length() == 0 {
+		// 存在非小组话题
+		return nil, nil
 	}
 
-	rets := r.FindSubmatch(topicContent)
-	if len(rets) != 10 {
-		return nil, errors.New("bad topic block")
+	authorBlock := titleBlock.Next()
+	replyBlock := authorBlock.Next()
+	timeBlock := replyBlock.Next()
+
+	titleBlock = titleBlock.Find("a")
+	url, exist := titleBlock.Attr("href")
+	if !exist {
+		return nil, errors.New("without url, " + s.Text())
+	}
+	title := titleBlock.Text()
+	if title == "" {
+		return nil, errors.New("without title, " + s.Text())
 	}
 
+	authorBlock = authorBlock.Find("a")
+	authorURL, exist := authorBlock.Attr("href")
+	if !exist {
+		return nil, errors.New("without author url, " + s.Text())
+	}
+	author := authorBlock.Text()
+	if author == "" {
+		return nil, errors.New("without author, " + s.Text())
+	}
+
+	replyStr := replyBlock.Text()
 	var reply int
-	replyStr := string(rets[7])
 	if replyStr == "" {
 		reply = 0
 	} else {
+		var err error
 		reply, err = strconv.Atoi(replyStr)
 		if err != nil {
 			return nil, err
 		}
 	}
 
+	replyTimeStr := timeBlock.Text()
+	if replyTimeStr == "" {
+		return nil, errors.New("without last reply time, " + s.Text())
+	}
 	// 时间格式是 08-31 23:42 加上当前年份方便解析成 time.Time
-	lastReplyTime, err := time.Parse("2006-01-02 15:04", strconv.Itoa(time.Now().Year())+"-"+string(rets[9]))
+	lastReplyTime, err := time.Parse("2006-01-02 15:04", strconv.Itoa(time.Now().Year())+"-"+replyTimeStr)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Topic{
-		URL:           string(rets[1]),
-		Titile:        string(rets[2]),
-		AuthorURL:     string(rets[4]),
-		Author:        string(rets[5]),
+		URL:           url,
+		Titile:        title,
+		AuthorURL:     authorURL,
+		Author:        author,
 		Reply:         reply,
 		LastReplyTime: lastReplyTime,
 	}, nil

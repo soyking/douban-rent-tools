@@ -2,7 +2,8 @@ package group
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"github.com/PuerkitoBio/goquery"
+	"os"
 	"testing"
 )
 
@@ -10,12 +11,17 @@ const (
 	TOPICS_NUMBER = 25
 )
 
-func getLocalContent() ([]byte, error) {
-	return ioutil.ReadFile("./group_test.html")
+func getLocalContent() (*goquery.Document, error) {
+	f, err := os.Open("./group_test.html")
+	if err != nil {
+		return nil, err
+	}
+
+	return goquery.NewDocumentFromReader(f)
 }
 
-func testTopics(t *testing.T, content []byte) {
-	topics, err := GetTopics(content)
+func testTopics(t *testing.T, doc *goquery.Document) {
+	topics, err := GetTopics(doc)
 	if err != nil {
 		t.Error(err)
 	} else if len(topics) != TOPICS_NUMBER {
@@ -36,7 +42,7 @@ func TestGetTopics(t *testing.T) {
 }
 
 func TestGetTopics2(t *testing.T) {
-	content, err := GetGroup("https://www.douban.com/group/beijingzufang/discussion", 25)
+	content, err := GetGroup("beijingzufang", "25")
 	if err != nil {
 		t.Error(err)
 	} else {
