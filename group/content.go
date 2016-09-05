@@ -83,7 +83,8 @@ func ParseTopicContent(doc *goquery.Document) (*TopicContent, error) {
 
 	updateTimeStr := wholeContent.Find("div.topic-doc h3 span.color-green").Text()
 	if updateTimeStr == "" {
-		return nil, errors.New("without upate time")
+		// 存在蓝色状态的帖子，感觉是一种预删除的状态，页面结构不一样，这里作帖子被删除处理
+		return nil, ErrorTopicDelete
 	}
 	updateTime, err := time.Parse("2006-01-02 15:04:05", updateTimeStr)
 	if err != nil {
