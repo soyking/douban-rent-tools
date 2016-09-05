@@ -26,3 +26,4 @@ _testmain.go
 *.prof
 
 douban-rent-spider
+spider/spider
