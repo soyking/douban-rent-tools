@@ -21,9 +21,8 @@ func runTask() {
 			if err != nil {
 				// TODO: BETTER LOGGER
 				log.Printf("\t\t\t[Fail] group: %s err: %s\n", g, err.Error())
-			} else {
-				store.Save(topics)
 			}
+			store.Save(topics)
 			log.Printf("\t\t\t[SUCCESS] topics %d\n", len(topics))
 		}
 		count += 1
