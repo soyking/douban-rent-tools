@@ -4,8 +4,8 @@ import (
 	"errors"
 	"github.com/PuerkitoBio/goquery"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 )
 
 type Topic struct {
@@ -18,13 +18,22 @@ type Topic struct {
 	TopicContent  *TopicContent
 }
 
+func GetTopics(name string) ([]*Topic, error) {
+	doc, err := GetGroup(name)
+	if err != nil {
+		return nil, err
+	}
+
+	return ParseTopics(doc)
+}
+
 // 从文档树中获取 Topic
-func GetTopics(doc *goquery.Document) ([]*Topic, error) {
+func ParseTopics(doc *goquery.Document) ([]*Topic, error) {
 	var topics []*Topic
 	var outErr error
 	doc.Find("html body #wrapper div#content div.grid-16-8.clearfix div.article div table.olt tbody tr").
 		Each(func(i int, s *goquery.Selection) {
-			topic, err := GetTopic(s)
+			topic, err := ParseTopic(s)
 			if err != nil {
 				outErr = errors.New("group: " + doc.Url.String() + " #" + strconv.Itoa(i) + "; " + err.Error())
 			}
@@ -38,7 +47,7 @@ func GetTopics(doc *goquery.Document) ([]*Topic, error) {
 }
 
 // 解析成自定义的 Topic
-func GetTopic(s *goquery.Selection) (*Topic, error) {
+func ParseTopic(s *goquery.Selection) (*Topic, error) {
 	titleBlock := s.Find("td.title")
 	if titleBlock.Length() == 0 {
 		// 存在非小组话题

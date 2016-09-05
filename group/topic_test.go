@@ -24,7 +24,7 @@ func getLocalGroup() (*goquery.Document, error) {
 }
 
 func testTopics(t *testing.T, doc *goquery.Document) {
-	topics, err := GetTopics(doc)
+	topics, err := ParseTopics(doc)
 	if err != nil {
 		t.Error(err)
 	} else {
@@ -34,7 +34,7 @@ func testTopics(t *testing.T, doc *goquery.Document) {
 	}
 }
 
-func TestGetTopics(t *testing.T) {
+func TestParseTopics(t *testing.T) {
 	content, err := getLocalGroup()
 	if err != nil {
 		t.Error(err)
@@ -43,7 +43,7 @@ func TestGetTopics(t *testing.T) {
 	}
 }
 
-func TestGetTopics2(t *testing.T) {
+func TestParseTopics2(t *testing.T) {
 	content, err := GetGroup("beijingzufang")
 	if err != nil {
 		t.Error(err)
