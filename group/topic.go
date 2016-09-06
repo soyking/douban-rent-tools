@@ -9,13 +9,13 @@ import (
 )
 
 type Topic struct {
-	URL           string
-	Titile        string
-	AuthorURL     string
-	Author        string
-	Reply         int
-	LastReplyTime time.Time
-	TopicContent  *TopicContent
+	URL           string        `json:"_id" bson:"_id"` // 作为唯一键
+	Titile        string        `json:"title" bson:"title"`
+	AuthorURL     string        `json:"author_url" bson:"author_url"`
+	Author        string        `json:"author" bson:"author"`
+	Reply         int           `json:"reply" bson:"reply"`
+	LastReplyTime time.Time     `json:"last_reply_time" bson:"last_reply_time"`
+	TopicContent  *TopicContent `json:"topic_content" bson:"topic_content"`
 }
 
 func GetTopics(name string) ([]*Topic, error) {

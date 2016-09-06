@@ -35,8 +35,9 @@ func NewMongoDBHandler(addr, username, password, database, collection string) (*
 	}, nil
 }
 
-func (m *MongoDBHandler) Insert(doc ...interface{}) error {
+func (m *MongoDBHandler) Upsert(selector, update interface{}) error {
 	sess := m.session.Copy()
 	defer sess.Close()
-	return sess.DB(m.database).C(m.collection).Insert(doc...)
+	_, err := sess.DB(m.database).C(m.collection).Upsert(selector, update)
+	return err
 }

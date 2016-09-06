@@ -1,6 +1,9 @@
 package mongo
 
-import "github.com/soyking/douban-rent-tools/group"
+import (
+	"github.com/soyking/douban-rent-tools/group"
+	"gopkg.in/mgo.v2/bson"
+)
 
 const (
 	TOPIC_COLLECTION = "topic"
@@ -16,15 +19,22 @@ func NewMongoDBStorage(addr, username, password, database string) (*MongoDBStora
 		return nil, err
 	}
 
+	// TODO: INDEX
 	return &MongoDBStorage{m}, nil
 }
 
 func (m *MongoDBStorage) Save(topics []*group.Topic) error {
-	ts := []interface{}{}
-	for i := range topics {
-		ts = append(ts, topics[i])
+	for _, topic := range topics {
+		err := m.mongoDBHandler.Upsert(
+			bson.M{"_id": topic.URL},
+			topic,
+		)
+		if err != nil {
+			return err
+		}
 	}
-	return m.mongoDBHandler.Insert(ts...)
+
+	return nil
 }
 
 func (m *MongoDBStorage) Query(q interface{}) ([]group.Topic, error) {

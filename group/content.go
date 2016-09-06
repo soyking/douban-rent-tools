@@ -39,11 +39,11 @@ func init() {
 }
 
 type TopicContent struct {
-	UpdateTime time.Time
-	Content    string
-	WithPic    bool
-	PicURLs    []string
-	Like       int
+	UpdateTime time.Time `json:"update_time" bson:"update_time"`
+	Content    string    `json:"content" bson:"content"`
+	WithPic    bool      `json:"with_pic" bson:"with_pic"`
+	PicURLs    []string  `json:"pic_urls" bson:"pic_urls"`
+	Like       int       `json:"like" bson:"like"`
 }
 
 func GetTopicContent(url string) (*TopicContent, error) {
@@ -81,6 +81,7 @@ func getTopicContent(url string) (*TopicContent, error) {
 func ParseTopicContent(doc *goquery.Document) (*TopicContent, error) {
 	wholeContent := doc.Find("html body div#wrapper div#content div.grid-16-8.clearfix div.article div.topic-content.clearfix")
 
+	// TODO: FULL TITLE
 	updateTimeStr := wholeContent.Find("div.topic-doc h3 span.color-green").Text()
 	if updateTimeStr == "" {
 		// 存在蓝色状态的帖子，感觉是一种预删除的状态，页面结构不一样，这里作帖子被删除处理
