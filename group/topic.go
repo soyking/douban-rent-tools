@@ -65,10 +65,11 @@ func ParseTopic(s *goquery.Selection) (*Topic, error) {
 	}
 	topicContent, err := GetTopicContent(url)
 	if err != nil {
-		if strings.Contains(err.Error(), ErrorTopicDelete.Error()) {
+		// http client 错误会包含其他
+		if err == ErrorTopicDelete || strings.Contains(err.Error(), ErrorTopicDelete.Error()) {
 			return nil, nil
 		}
-		return nil, err
+		return nil, errors.New("topic: " + url + "; " + err.Error())
 	}
 
 	title, exist := titleBlock.Attr("title")

@@ -23,6 +23,7 @@ var (
 	ErrorTopicDelete = errors.New("topic has been deleted")
 
 	httpClient = &http.Client{
+		// 使用一个不支持 302 跳转的 client，防止被删除帖子跳转到首页
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return ErrorTopicDelete
 		},
@@ -47,15 +48,6 @@ type TopicContent struct {
 }
 
 func GetTopicContent(url string) (*TopicContent, error) {
-	t, err := getTopicContent(url)
-	if err != nil {
-		return nil, errors.New("topic: " + url + "; " + err.Error())
-	}
-
-	return t, nil
-}
-
-func getTopicContent(url string) (*TopicContent, error) {
 	resp, err := httpClient.Get(url)
 	if err != nil {
 		return nil, err
