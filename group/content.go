@@ -61,7 +61,7 @@ func getTopicContent(url string) (*TopicContent, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode == http.StatusNotFound || resp.StatusCode == http.StatusFound {
+	if resp.StatusCode != http.StatusOK {
 		return nil, ErrorTopicDelete
 	}
 
@@ -79,10 +79,9 @@ func getTopicContent(url string) (*TopicContent, error) {
 }
 
 func ParseTopicContent(doc *goquery.Document) (*TopicContent, error) {
-	wholeContent := doc.Find("html body div#wrapper div#content div.grid-16-8.clearfix div.article div.topic-content.clearfix")
+	wholeBlock := doc.Find("html body div#wrapper div#content div.grid-16-8.clearfix div.article div.topic-content.clearfix")
 
-	// TODO: FULL TITLE
-	updateTimeStr := wholeContent.Find("div.topic-doc h3 span.color-green").Text()
+	updateTimeStr := wholeBlock.Find("div.topic-doc h3 span.color-green").Text()
 	if updateTimeStr == "" {
 		// 存在蓝色状态的帖子，感觉是一种预删除的状态，页面结构不一样，这里作帖子被删除处理
 		return nil, ErrorTopicDelete
@@ -92,17 +91,17 @@ func ParseTopicContent(doc *goquery.Document) (*TopicContent, error) {
 		return nil, err
 	}
 
-	topicContent := wholeContent.Find("div.topic-doc div#link-report div.topic-content")
-	if topicContent.Length() == 0 {
+	topicBlock := wholeBlock.Find("div.topic-doc div#link-report div.topic-content")
+	if topicBlock.Length() == 0 {
 		return nil, errors.New("without content")
 	}
 
 	content := []string{}
-	topicContent.Find("p").Each(func(i int, s *goquery.Selection) {
+	topicBlock.Find("p").Each(func(i int, s *goquery.Selection) {
 		content = append(content, emptyReplacer.Replace(s.Text()))
 	})
 
-	picBlock := topicContent.Find("div.topic-figure.cc")
+	picBlock := topicBlock.Find("div.topic-figure.cc")
 	withPic := false
 	picURLs := []string{}
 	if picBlock.Length() > 0 {
@@ -115,7 +114,7 @@ func ParseTopicContent(doc *goquery.Document) (*TopicContent, error) {
 		})
 	}
 
-	likeStr := wholeContent.Find("div#sep.sns-bar div.sns-bar-fav span.fav-num a").Text()
+	likeStr := wholeBlock.Find("div#sep.sns-bar div.sns-bar-fav span.fav-num a").Text()
 	like := 0
 	if likeStr != "" {
 		like, err = strconv.Atoi(strings.TrimRight(likeStr, "人"))

@@ -10,7 +10,7 @@ import (
 
 type Topic struct {
 	URL           string        `json:"_id" bson:"_id"` // 作为唯一键
-	Titile        string        `json:"title" bson:"title"`
+	Title         string        `json:"title" bson:"title"`
 	AuthorURL     string        `json:"author_url" bson:"author_url"`
 	Author        string        `json:"author" bson:"author"`
 	Reply         int           `json:"reply" bson:"reply"`
@@ -71,8 +71,8 @@ func ParseTopic(s *goquery.Selection) (*Topic, error) {
 		return nil, err
 	}
 
-	title := titleBlock.Text()
-	if title == "" {
+	title, exist := titleBlock.Attr("title")
+	if !exist || title == "" {
 		return nil, errors.New("without title")
 	}
 
@@ -108,7 +108,7 @@ func ParseTopic(s *goquery.Selection) (*Topic, error) {
 
 	return &Topic{
 		URL:           url,
-		Titile:        title,
+		Title:         title,
 		AuthorURL:     authorURL,
 		Author:        author,
 		Reply:         reply,
