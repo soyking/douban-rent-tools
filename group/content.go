@@ -9,10 +9,6 @@ import (
 	"time"
 )
 
-const (
-	TOPIC_CONTENT_NOT_FOUND = "呃...你想要的东西不在这儿"
-)
-
 var (
 	EMPTY_WORD = []string{
 		" ",
@@ -21,13 +17,6 @@ var (
 	emptyReplacer *strings.Replacer
 
 	ErrorTopicDelete = errors.New("topic has been deleted")
-
-	httpClient = &http.Client{
-		// 使用一个不支持 302 跳转的 client，防止被删除帖子跳转到首页
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return ErrorTopicDelete
-		},
-	}
 )
 
 func init() {

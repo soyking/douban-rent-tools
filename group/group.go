@@ -1,6 +1,14 @@
 package group
 
-import "github.com/PuerkitoBio/goquery"
+import (
+	"errors"
+	"github.com/PuerkitoBio/goquery"
+	"net/http"
+)
+
+var (
+	ErrorForbidden = errors.New("request is forbidden, maybe too frequently")
+)
 
 func getGroupURL(name string, start ...string) string {
 	s := "0"
@@ -13,5 +21,17 @@ func getGroupURL(name string, start ...string) string {
 // 获取豆瓣小组的内容 start 表示从第几条开始 默认 0
 // 返回 25 条结果的网页内容
 func GetGroup(name string, start ...string) (*goquery.Document, error) {
-	return goquery.NewDocument(getGroupURL(name, start...))
+	resp, err := httpClient.Get(getGroupURL(name, start...))
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusForbidden {
+			return nil, ErrorForbidden
+		}
+		return nil, ErrorTopicDelete
+	}
+
+	return goquery.NewDocumentFromResponse(resp)
 }
