@@ -18,7 +18,7 @@ func runTask() {
 	for _ = range tick {
 		log.Printf("\ttask %d\n", count)
 		var wg sync.WaitGroup
-		taskChan := make(chan int, groupsThread)
+		taskChan := make(chan int, groupsConcurrency)
 
 		for _, g := range groups {
 			taskChan <- 1

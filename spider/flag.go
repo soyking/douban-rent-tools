@@ -27,24 +27,24 @@ const (
 	FLAG_FREQUENCY_DEFUALT = 60
 	FLAG_FREQUENCY_USAGE   = "spider frequency(in second)"
 
-	FLAG_GROUPS_THREAD_NAME    = "g_thread"
-	FLAG_GROUPS_THREAD_DEFAULT = 1
-	FLAG_GROUPS_THREAD_USAGE   = "threads for groups crawling"
+	FLAG_GROUPS_CONCURRENCY_NAME    = "g_con"
+	FLAG_GROUPS_CONCURRENCY_DEFAULT = 1
+	FLAG_GROUPS_CONCURRENCY_USAGE   = "concurrency for groups crawling"
 
-	FLAG_TOPICS_THREAD_NAME    = "t_thread"
-	FLAG_TOPICS_THREAD_DEFAULT = 1
-	FLAG_TOPICS_THREAD_USAGE   = "threads for topics crawling"
+	FLAG_TOPICS_CONCURRENCY_NAME    = "t_con"
+	FLAG_TOPICS_CONCURRENCY_DEFAULT = 1
+	FLAG_TOPICS_CONCURRENCY_USAGE   = " for topics crawling"
 )
 
 var (
-	groupNames      string
-	mongoDBAddr     string
-	mongoDBUsername string
-	mongoDBPassword string
-	mongoDBDatabase string
-	frequency       int
-	groupsThread    int
-	topicsThread    int
+	groupNames        string
+	mongoDBAddr       string
+	mongoDBUsername   string
+	mongoDBPassword   string
+	mongoDBDatabase   string
+	frequency         int
+	groupsConcurrency int
+	topicsConcurrency int
 )
 
 func init() {
@@ -54,17 +54,17 @@ func init() {
 	flag.StringVar(&mongoDBPassword, FLAG_MONGO_PASSWORD_NAME, FLAG_MONGO_PASSWORD_DEFAULT, FLAG_MONGO_PASSWORD_USAGE)
 	flag.StringVar(&mongoDBDatabase, FLAG_MONGO_DATABASE_NAME, FLAG_MONGO_DATABASE_DEFAULT, FLAG_MONGO_DATABASE_USAGE)
 	flag.IntVar(&frequency, FLAG_FREQUENCY_NAME, FLAG_FREQUENCY_DEFUALT, FLAG_FREQUENCY_USAGE)
-	flag.IntVar(&groupsThread, FLAG_GROUPS_THREAD_NAME, FLAG_GROUPS_THREAD_DEFAULT, FLAG_GROUPS_THREAD_USAGE)
-	flag.IntVar(&topicsThread, FLAG_TOPICS_THREAD_NAME, FLAG_TOPICS_THREAD_DEFAULT, FLAG_TOPICS_THREAD_USAGE)
+	flag.IntVar(&groupsConcurrency, FLAG_GROUPS_CONCURRENCY_NAME, FLAG_GROUPS_CONCURRENCY_DEFAULT, FLAG_GROUPS_CONCURRENCY_USAGE)
+	flag.IntVar(&topicsConcurrency, FLAG_TOPICS_CONCURRENCY_NAME, FLAG_TOPICS_CONCURRENCY_DEFAULT, FLAG_TOPICS_CONCURRENCY_USAGE)
 	flag.Parse()
 
 	if frequency <= 0 {
 		frequency = FLAG_FREQUENCY_DEFUALT
 	}
-	if groupsThread <= 0 {
-		groupsThread = FLAG_GROUPS_THREAD_DEFAULT
+	if groupsConcurrency <= 0 {
+		groupsConcurrency = FLAG_GROUPS_CONCURRENCY_DEFAULT
 	}
-	if topicsThread <= 0 {
-		groupsThread = FLAG_TOPICS_THREAD_DEFAULT
+	if topicsConcurrency <= 0 {
+		groupsConcurrency = FLAG_TOPICS_CONCURRENCY_DEFAULT
 	}
 }

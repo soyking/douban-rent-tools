@@ -3,8 +3,10 @@ package group
 import (
 	"errors"
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/net/html"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -18,32 +20,52 @@ type Topic struct {
 	TopicContent  *TopicContent `json:"topic_content" bson:"topic_content"`
 }
 
-func GetTopics(name string) ([]*Topic, error) {
+func GetTopics(name string, concurrency ...int) ([]*Topic, error) {
 	doc, err := GetGroup(name)
 	if err != nil {
 		return nil, err
 	}
 
-	return ParseTopics(doc)
+	return ParseTopics(doc, concurrency...)
 }
 
 // 从文档树中获取 Topic
-func ParseTopics(doc *goquery.Document) ([]*Topic, error) {
+func ParseTopics(doc *goquery.Document, concurrency ...int) ([]*Topic, error) {
 	var topics []*Topic
-	var outErr error
-	doc.Find("html body #wrapper div#content div.grid-16-8.clearfix div.article div table.olt tbody tr").
-		Each(func(i int, s *goquery.Selection) {
+	var outErr []string
+	nodes := doc.Find("html body #wrapper div#content div.grid-16-8.clearfix div.article div table.olt tbody tr").Nodes
+
+	con := 1
+	if len(concurrency) > 0 {
+		con = concurrency[0]
+	}
+	var wg sync.WaitGroup
+	topicsChan := make(chan int, con)
+
+	for i := range nodes {
+		topicsChan <- 1
+		wg.Add(1)
+		go func(s *goquery.Selection) {
 			topic, err := ParseTopic(s)
 			if err != nil {
-				outErr = errors.New("group: " + doc.Url.String() + " #" + strconv.Itoa(i) + "; " + err.Error())
+				outErr = append(outErr, "group: "+doc.Url.String()+" #"+strconv.Itoa(i)+"; "+err.Error())
 			}
 
 			if topic != nil {
 				topics = append(topics, topic)
 			}
-		},
-		)
-	return topics, outErr
+
+			wg.Done()
+			<-topicsChan
+		}(&goquery.Selection{Nodes: []*html.Node{nodes[i]}})
+	}
+
+	wg.Wait()
+	if len(outErr) != 0 {
+		return topics, errors.New(strings.Join(outErr, " ## "))
+	} else {
+		return topics, nil
+	}
 }
 
 // 解析成自定义的 Topic
