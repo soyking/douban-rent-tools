@@ -85,6 +85,7 @@ func (m *MongoDBStorage) Query(r *storage.QueryRequest) (int, []group.Topic, err
 	queries = getTimeQuery(queries, r.ToLastReplyTime, "last_reply_time", "$lte")
 
 	if len(r.SortedBy) == 0 {
+		// 默认按最晚回复时间排序
 		r.SortedBy = []string{"-last_reply_time"}
 	}
 
@@ -94,7 +95,6 @@ func (m *MongoDBStorage) Query(r *storage.QueryRequest) (int, []group.Topic, err
 	}
 
 	var result []group.Topic
-	// 默认按最晚回复时间排序
 	count, err := m.mongoDBHandler.FindAll(
 		query,
 		r.Page,
