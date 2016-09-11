@@ -41,3 +41,25 @@ func (m *MongoDBHandler) Upsert(selector, update interface{}) error {
 	_, err := sess.DB(m.database).C(m.collection).Upsert(selector, update)
 	return err
 }
+
+func (m *MongoDBHandler) EnsureIndex(keys ...string) error {
+	sess := m.session.Copy()
+	defer sess.Close()
+	return sess.DB(m.database).C(m.collection).EnsureIndex(
+		mgo.Index{
+			Key:        keys,
+			Background: true,
+		},
+	)
+}
+
+func (m *MongoDBHandler) FindAll(query interface{}, page, size int, result interface{}, sortedBy ...string) (int, error) {
+	sess := m.session.Copy()
+	defer sess.Close()
+	q := sess.DB(m.database).C(m.collection).Find(query)
+	count, err := q.Count()
+	if err != nil {
+		return 0, err
+	}
+	return count, q.Sort(sortedBy...).Skip(page * size).Limit(size).All(result)
+}

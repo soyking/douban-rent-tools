@@ -2,6 +2,7 @@ package es
 
 import (
 	"github.com/soyking/douban-rent-tools/group"
+	"github.com/soyking/douban-rent-tools/storage"
 	"gopkg.in/olivere/elastic.v3"
 )
 
@@ -61,6 +62,6 @@ func (e *ElasticSearchStorage) Save(topics []*group.Topic) error {
 	return err
 }
 
-func (e *ElasticSearchStorage) Query(q interface{}) ([]group.Topic, error) {
+func (e *ElasticSearchStorage) Query(r *storage.QueryRequest) ([]group.Topic, error) {
 	return []group.Topic{}, nil
 }
