@@ -32,7 +32,7 @@ func TitleFilter(titles []string) FilterFunc {
 	}
 }
 
-// 过滤包含特定字符串标题的帖子
+// 过滤包含特定字符串内容的帖子
 func ContentFilter(contents []string) FilterFunc {
 	return func(t *group.Topic) bool {
 		if t.TopicContent == nil {

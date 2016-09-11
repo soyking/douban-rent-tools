@@ -25,11 +25,12 @@ func runTask() {
 			wg.Add(1)
 
 			go func(groupName string) {
-				topics, err := group.GetTopics(groupName)
+				topics, err := group.GetTopics(groupName, topicsConcurrency)
 				if err != nil {
 					// TODO: BETTER LOGGER
 					log.Printf("\t\t[Fail] group: %s err: %s\n", groupName, err.Error())
 				}
+				topics = topicsFilter(topics)
 				store.Save(topics)
 				log.Printf("\t\t[SUCCESS] group: %s topics %d\n", groupName, len(topics))
 				wg.Done()
