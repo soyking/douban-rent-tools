@@ -11,7 +11,7 @@ import (
 )
 
 type Topic struct {
-	URL           string        `json:"_id" bson:"_id"` // 作为唯一键
+	URL           string        `json:"_id,omitempty" bson:"_id"` // 作为唯一键
 	Title         string        `json:"title" bson:"title"`
 	AuthorURL     string        `json:"author_url" bson:"author_url"`
 	Author        string        `json:"author" bson:"author"`
