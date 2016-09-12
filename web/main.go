@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/json"
 	"github.com/soyking/douban-rent-tools/storage"
-	"github.com/soyking/douban-rent-tools/storage/mongo"
+	"github.com/soyking/douban-rent-tools/storage/es"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -12,7 +13,11 @@ import (
 var store storage.Storage
 
 func main() {
-	store, _ = mongo.NewMongoDBStorage("", "", "", "db_rent")
+	var err error
+	store, err = es.NewElasticSearchStorage("127.0.0.1:9200", "db_rent")
+	if err != nil {
+		log.Fatal(err)
+	}
 	http.HandleFunc("/query", queryHandler)
 	http.ListenAndServe(":8080", nil)
 }
