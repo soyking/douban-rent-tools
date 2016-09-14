@@ -18,8 +18,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./static"))))
 	http.HandleFunc("/query", queryHandler)
-	http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/src/index.html")
+	})
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func writeErr(w http.ResponseWriter, err error) {
