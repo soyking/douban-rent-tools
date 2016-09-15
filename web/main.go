@@ -3,21 +3,20 @@ package main
 import (
 	"encoding/json"
 	"github.com/soyking/douban-rent-tools/storage"
-	"github.com/soyking/douban-rent-tools/storage/es"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-var store storage.Storage
+const (
+	APP_NAME    = "DOUBAN RENT TOOLS - WEB"
+	APP_VERSION = "0.0.1"
+)
 
 func main() {
-	var err error
-	store, err = es.NewElasticSearchStorage("127.0.0.1:9200", "db_rent")
-	if err != nil {
-		log.Fatal(err)
-	}
+	println(APP_NAME + "\t" + APP_VERSION)
+	initStorage()
 
 	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("./static"))))
 	http.HandleFunc("/query", queryHandler)
@@ -25,7 +24,8 @@ func main() {
 		http.ServeFile(w, r, "./static/dist/index.html")
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Printf("listen on " + port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 func writeErr(w http.ResponseWriter, err error) {
