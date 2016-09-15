@@ -33,16 +33,19 @@ const columns = [{
     }, {
       title: '有图',
       dataIndex: 'withPic',
-      key: 'withPic',
-      render: withPic => {return withPic?"是":"否" }
+      key: 'topic_content.with_pic',
+      render: withPic => {return withPic?"是":"否" },
+      sorter: true,
     }, {
       title: '回复数',
       dataIndex: 'reply',
       key: 'reply',
+      sorter: true,
     }, {
       title: '喜欢数',
       dataIndex: 'like',
-      key: 'like',
+      key: 'topic_content.like',
+      sorter: true,
     }]
 
 const Root = React.createClass({
@@ -182,7 +185,9 @@ const Root = React.createClass({
       <Box centerJustified>
         <Box vertical style={{width:"40%"}}>
           <Box center centerJustified>
-            <div style={{color:"green", paddingTop:100, paddingBottom:50, fontSize:30}}>DOUBAN RENT TOOLS</div>
+            <div style={{color:"green", paddingTop:100, paddingBottom:50, fontSize:30}}>
+              <Box center>DOUBAN<img src="https://img3.doubanio.com/pics/douban-icons/favicon_32x32.png"/>RENT TOOLS</Box>
+            </div>
           </Box>
           <Box vertical>
             <Box center style={{margin:"10px"}}>
