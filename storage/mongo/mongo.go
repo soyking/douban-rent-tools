@@ -35,11 +35,12 @@ func NewMongoDBHandler(addr, username, password, database, collection string) (*
 	}, nil
 }
 
-func (m *MongoDBHandler) Upsert(selector, update interface{}) error {
+func (m *MongoDBHandler) BulkUpsert(pairs ...interface{}) (*mgo.BulkResult, error) {
 	sess := m.session.Copy()
 	defer sess.Close()
-	_, err := sess.DB(m.database).C(m.collection).Upsert(selector, update)
-	return err
+	bulk := sess.DB(m.database).C(m.collection).Bulk()
+	bulk.Upsert(pairs...)
+	return bulk.Run()
 }
 
 func (m *MongoDBHandler) EnsureIndex(keys ...string) error {

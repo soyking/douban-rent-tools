@@ -20,27 +20,16 @@ func NewMongoDBStorage(addr, username, password, database string) (*MongoDBStora
 	if err != nil {
 		return nil, err
 	}
-
-	m.EnsureIndex("$text:title")
-	m.EnsureIndex("$text:topic_content.content")
-	m.EnsureIndex("last_reply_time")
-	m.EnsureIndex("topic_content.update_time")
-
 	return &MongoDBStorage{m}, nil
 }
 
 func (m *MongoDBStorage) Save(topics []*group.Topic) error {
+	pairs := []interface{}{}
 	for i := range topics {
-		err := m.mongoDBHandler.Upsert(
-			bson.M{"_id": topics[i].URL},
-			topics[i],
-		)
-		if err != nil {
-			return err
-		}
+		pairs = append(pairs, bson.M{"_id": topics[i].URL}, topics[i])
 	}
-
-	return nil
+	_, err := m.mongoDBHandler.BulkUpsert(pairs...)
+	return err
 }
 
 const ANY = ".*"
