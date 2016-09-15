@@ -5,6 +5,46 @@ import Keywords from './Keywords.jsx'
 import {DatePicker, Button, Table, message} from 'antd'
 import 'antd/dist/antd.min.css'
 
+const columns = [{
+      title: '标题',
+      dataIndex: 'title',
+      key: 'title',
+      width: 200,
+      render(title) {
+        return <a href={title.url} target="_blank">{title.title}</a>
+      }
+    }, {
+      title: '用户',
+      dataIndex: 'author',
+      key: 'author',
+      render(author) {
+        return <a href={author.url} target="_blank">{author.author}</a>
+      }
+    }, {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      key: 'topic_content.update_time',
+      sorter: true,
+    }, {
+      title: '回复时间',
+      dataIndex: 'lastReplyTime',
+      key: 'last_reply_time',
+      sorter: true,
+    }, {
+      title: '有图',
+      dataIndex: 'withPic',
+      key: 'withPic',
+      render: withPic => {return withPic?"是":"否" }
+    }, {
+      title: '回复数',
+      dataIndex: 'reply',
+      key: 'reply',
+    }, {
+      title: '喜欢数',
+      dataIndex: 'like',
+      key: 'like',
+    }]
+
 const Root = React.createClass({
   getInitialState() {
     return {
@@ -15,6 +55,7 @@ const Root = React.createClass({
       toLastReplyTime: null,
       page: 0,
       size: 10,
+      sortedBy: [],
       count: 0,
       data: [],
     }
@@ -46,7 +87,9 @@ const Root = React.createClass({
 
   formatDate(date){
     if (!date) {return null}
-    return date.replace("T"," ").replace("+08:00","")
+    let d = new Date(date)
+    d.setTime( d.getTime() + d.getTimezoneOffset()*60*1000 )
+    return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getUTCDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()
   },
 
   search(){
@@ -54,11 +97,12 @@ const Root = React.createClass({
     this.query(0)
   },
 
-  query(page){
+  query(page, sortedBy){
     let params = this.state
     let body = {
       "page": page,
       "size": params.size,
+      "sorted_by": sortedBy || params.sortedBy,
       "from_update_time": params.fromUpdateTime || 0,
       "to_update_time": params.toUpdateTime || 0,
       "from_last_reply_time": params.fromLastReplyTime || 0,
@@ -108,50 +152,30 @@ const Root = React.createClass({
     this.query(page)
   },
 
+  handleTableChange(pagination, filters, sorter) {
+    if (pagination) {
+      const page = this.state.page+1
+      if (page!==pagination.current){
+        // 有分页变化只处理分页
+        this.onPageChange(pagination.current)
+        return 
+      }
+    }
+
+    if (sorter.columnKey) {
+      let key = (sorter.order === "descend"?"-":"")+sorter.columnKey
+      const page = this.state.page
+      this.setState({sortedBy:[key]})
+      this.query(page, [key])
+    }
+  },
+
   render() {
-    const columns = [{
-      title: '标题',
-      dataIndex: 'title',
-      key: 'title',
-      width: 200,
-      render(title) {
-        return <a href={title.url} target="_blank">{title.title}</a>
-      }
-    }, {
-      title: '用户',
-      dataIndex: 'author',
-      key: 'author',
-      render(author) {
-        return <a href={author.url} target="_blank">{author.author}</a>
-      }
-    }, {
-      title: '更新时间',
-      dataIndex: 'updateTime',
-      key: 'updateTime'
-    }, {
-      title: '回复时间',
-      dataIndex: 'lastReplyTime',
-      key: 'lastReplyTime',
-    }, {
-      title: '有图',
-      dataIndex: 'withPic',
-      key: 'withPic',
-      render: withPic => {return withPic?"是":"否" }
-    }, {
-      title: '回复数',
-      dataIndex: 'reply',
-      key: 'reply',
-    }, {
-      title: '喜欢数',
-      dataIndex: 'like',
-      key: 'like',
-    }]
     const dataSource = this.state.data
     let that = this
     const pagination = {
       current: this.state.page+1,
-      total: this.state.count,
-      onChange: this.onPageChange
+      total: this.state.count
     };
 
     return (
@@ -181,7 +205,7 @@ const Root = React.createClass({
               <Button type="primary" icon="search" onClick={this.search}>搜索</Button>
             </Box>
           </Box>
-          <Table dataSource={dataSource} columns={columns} pagination={pagination}/>
+          <Table dataSource={dataSource} columns={columns} pagination={pagination} onChange={this.handleTableChange}/>
         </Box>
       </Box>
     );
