@@ -39,7 +39,7 @@ const Keywords = React.createClass({
   render() {
     const { keywords, input } = this.state
     return (
-      <Box stretch wrap style={{borderStyle:"solid", borderWidth:1, borderColor:"green", borderRadius:5}}>
+      <Box stretch wrap style={{borderStyle:"solid", borderWidth:1, borderColor:"#989898", borderRadius:5}}>
         {
           keywords.map(keyword =>
             <div key={keyword.index} style={{margin:6}}>

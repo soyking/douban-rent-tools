@@ -4,7 +4,6 @@ import {Item, Box} from 'react-polymer-layout'
 import Keywords from './Keywords.jsx'
 import {DatePicker, Button, Table, message} from 'antd'
 import 'antd/dist/antd.min.css'
-import './css/patch.css'
 
 const Root = React.createClass({
   getInitialState() {
@@ -14,6 +13,9 @@ const Root = React.createClass({
       toUpdateTime: null,
       fromLastReplyTime: null,
       toLastReplyTime: null,
+      page: 0,
+      size: 10,
+      count: 0,
       data: [],
     }
   },
@@ -47,9 +49,16 @@ const Root = React.createClass({
     return date.replace("T"," ").replace("+08:00","")
   },
 
-  query(){
+  search(){
+    this.setState({page:0})
+    this.query(0)
+  },
+
+  query(page){
     let params = this.state
     let body = {
+      "page": page,
+      "size": params.size,
       "from_update_time": params.fromUpdateTime || 0,
       "to_update_time": params.toUpdateTime || 0,
       "from_last_reply_time": params.fromLastReplyTime || 0,
@@ -69,19 +78,21 @@ const Root = React.createClass({
             message.error(resp.error)
           } else {
             let data = []
-            resp.result.forEach(t => {
-              let topic = {}
-              topic.key = t._id
-              topic.title = {title: t.title || "", url: t._id ||""},
-              topic.author = {author: t.author || "", url: t.author_url ||""}
-              topic.updateTime = that.formatDate(t.topic_content.update_time) || ""
-              topic.lastReplyTime = that.formatDate(t.last_reply_time) || ""
-              topic.withPic = t.topic_content.with_pic || false
-              topic.reply = t.reply || 0
-              topic.like = t.topic_content.like || 0
-              data.push(topic)
-            })
-            that.setState({data:data})
+            if (resp.result) {
+              resp.result.forEach(t => {
+                let topic = {}
+                topic.key = t._id
+                topic.title = {title: t.title || "", url: t._id ||""},
+                topic.author = {author: t.author || "", url: t.author_url ||""}
+                topic.updateTime = that.formatDate(t.topic_content.update_time) || ""
+                topic.lastReplyTime = that.formatDate(t.last_reply_time) || ""
+                topic.withPic = t.topic_content.with_pic || false
+                topic.reply = t.reply || 0
+                topic.like = t.topic_content.like || 0
+                data.push(topic)
+              })
+            }
+            that.setState({count:resp.count, data:data})
           }
         } else {
           message.error(req.status)
@@ -89,6 +100,12 @@ const Root = React.createClass({
       }
     }
     req.send(JSON.stringify(body))
+  },
+
+  onPageChange(page) {
+    page = page-1
+    this.setState({page:page})
+    this.query(page)
   },
 
   render() {
@@ -130,6 +147,12 @@ const Root = React.createClass({
       key: 'like',
     }]
     const dataSource = this.state.data
+    let that = this
+    const pagination = {
+      current: this.state.page+1,
+      total: this.state.count,
+      onChange: this.onPageChange
+    };
 
     return (
       <Box centerJustified>
@@ -139,26 +162,26 @@ const Root = React.createClass({
           </Box>
           <Box vertical>
             <Box center style={{margin:"10px"}}>
-              <div style={{color:"green", fontSize:25, marginRight:86}}>关键词</div>
+              <div style={{color:"#989898", fontSize:25, marginRight:86}}>关键词</div>
               <Item flex><Keywords onChange={this.updateKeywords}/></Item>
             </Box>
             <Box cneter style={{margin:"10px"}}>
-              <div style={{color:"green", fontSize:25, marginRight:10}}>最后更新时间</div>
+              <div style={{color:"#989898", fontSize:25, marginRight:10}}>最后更新时间</div>
               <Item flex style={{marginTop:5}}>
                 <DatePicker.RangePicker format="yyyy-MM-dd HH:mm:ss" showTime style={{width:"100%"}} onChange={this.updateUpdateTime}/>
               </Item>
             </Box>
             <Box cneter style={{margin:"10px"}}>
-              <div style={{color:"green", fontSize:25, marginRight:10}}>最后回复时间</div>
+              <div style={{color:"#989898", fontSize:25, marginRight:10}}>最后回复时间</div>
               <Item flex style={{marginTop:5}}>
                 <DatePicker.RangePicker format="yyyy-MM-dd HH:mm:ss" showTime style={{width:"100%"}} onChange={this.updateLastReplyTime}/>
               </Item>
             </Box>
             <Box endJustified style={{margin:"10px"}}>
-              <Button type="primary" icon="search" onClick={this.query}>搜索</Button>
+              <Button type="primary" icon="search" onClick={this.search}>搜索</Button>
             </Box>
           </Box>
-          <Table dataSource={dataSource} columns={columns} />
+          <Table dataSource={dataSource} columns={columns} pagination={pagination}/>
         </Box>
       </Box>
     );
