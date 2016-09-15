@@ -11,10 +11,7 @@ const (
 	FLAG_GROUPS_DEFAULT = "beijingzufang"
 	FLAG_GROUPS_USAGE   = "group name, split by ,"
 
-	FLAG_MONGO_ADDR_NAME    = "mg_addr"
-	FLAG_MONGO_ADDR_DEFAULT = "127.0.0.1:27017"
-	FLAG_MONGO_ADDR_USAGE   = "MongoDB address, split by ,"
-
+	// ==== ElasticSearch Setting ====
 	FLAG_ES_ADDR_NAME    = "es_addr"
 	FLAG_ES_ADDR_DEFAULT = "127.0.0.1:9200"
 	FLAG_ES_ADDR_USAGE   = "es address"
@@ -23,9 +20,14 @@ const (
 	FLAG_ES_INDEX_DEFAULT = "db_rent"
 	FLAG_ES_INDEX_USAGE   = "es index"
 
+	// ==== MongoDB Setting ====
 	FLAG_USE_MONGO_NAME    = "mongo"
 	FLAG_USE_MONGO_DEFAULT = false
 	FLAG_USE_MONGO_USAGE   = "use mongo storage"
+
+	FLAG_MONGO_ADDR_NAME    = "mg_addr"
+	FLAG_MONGO_ADDR_DEFAULT = "127.0.0.1:27017"
+	FLAG_MONGO_ADDR_USAGE   = "MongoDB address, split by ,"
 
 	FLAG_MONGO_USERNAME_NAME    = "mg_usr"
 	FLAG_MONGO_USERNAME_DEFAULT = ""
@@ -39,6 +41,7 @@ const (
 	FLAG_MONGO_DATABASE_DEFAULT = "db_rent"
 	FLAG_MONGO_DATABASE_USAGE   = "MongoDB database"
 
+	// ==== Crawling Setting ====
 	FLAG_FREQUENCY_NAME    = "freq"
 	FLAG_FREQUENCY_DEFUALT = 60
 	FLAG_FREQUENCY_USAGE   = "spider frequency(in second)"
@@ -51,6 +54,7 @@ const (
 	FLAG_TOPICS_CONCURRENCY_DEFAULT = 1
 	FLAG_TOPICS_CONCURRENCY_USAGE   = " for topics crawling"
 
+	// ==== Filter Setting ====
 	FLAG_AUTHOR_FILTER_NAME    = "author_filter"
 	FLAG_AUTHOR_FILTER_DEFAULT = "NO_FILE"
 	FLAG_AUTHOR_FILTER_USAGE   = "author filter file path, split by new line"
