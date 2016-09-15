@@ -1,7 +1,6 @@
 import React from 'react'
 import {Tag, Input} from 'antd'
 import {Box} from 'react-polymer-layout'
-import 'antd/dist/antd.min.css'
 
 const Keywords = React.createClass({
   getInitialState() {
@@ -15,6 +14,7 @@ const Keywords = React.createClass({
   removeKeyword(i) {
     const keywords = [...this.state.keywords].filter(keyword => keyword && (keyword.index !== i))
     this.setState({keywords:keywords})
+    this.onChange(keywords)
   },
 
   addKeyword(e) {
@@ -23,6 +23,13 @@ const Keywords = React.createClass({
     count=count+1
     keywords.push({index:count, value:e.target.value})
     this.setState({count:count, keywords:keywords, input:""})
+    this.onChange(keywords)
+  },
+
+  onChange(keywords){
+    if (this.props.onChange) {
+      this.props.onChange(keywords)
+    }
   },
 
   inputChange(e) {
