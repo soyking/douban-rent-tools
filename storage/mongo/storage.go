@@ -51,9 +51,11 @@ func getRegex(keyword string) string {
 
 func getTimeQuery(queries []bson.M, timestamp int64, field string, cond string) []bson.M {
 	if timestamp != 0 {
+		// mongo 时间查询需要 utc 时间，要加上时区时间差
+		timestamp = timestamp + 8*60*60
 		return append(
 			queries,
-			bson.M{field: bson.M{cond: time.Unix(timestamp, 0)}},
+			bson.M{field: bson.M{cond: time.Unix(timestamp, 0).UTC()}},
 		)
 	}
 	return queries
