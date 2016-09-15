@@ -85,9 +85,14 @@ func (m *MongoDBStorage) Query(r *storage.QueryRequest) (int, []group.Topic, err
 		query = bson.M{"$and": queries}
 	}
 
+	selector := bson.M{
+		"topic_content.content":  0,
+		"topic_content.pic_urls": 0,
+	}
 	var result []group.Topic
 	count, err := m.mongoDBHandler.FindAll(
 		query,
+		selector,
 		r.Page,
 		r.Size,
 		&result,

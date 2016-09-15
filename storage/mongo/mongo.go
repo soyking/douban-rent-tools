@@ -54,7 +54,7 @@ func (m *MongoDBHandler) EnsureIndex(keys ...string) error {
 	)
 }
 
-func (m *MongoDBHandler) FindAll(query interface{}, page, size int, result interface{}, sortedBy ...string) (int, error) {
+func (m *MongoDBHandler) FindAll(query, selector interface{}, page, size int, result interface{}, sortedBy ...string) (int, error) {
 	sess := m.session.Copy()
 	defer sess.Close()
 	q := sess.DB(m.database).C(m.collection).Find(query)
@@ -62,5 +62,5 @@ func (m *MongoDBHandler) FindAll(query interface{}, page, size int, result inter
 	if err != nil {
 		return 0, err
 	}
-	return count, q.Sort(sortedBy...).Skip(page * size).Limit(size).All(result)
+	return count, q.Select(selector).Sort(sortedBy...).Skip(page * size).Limit(size).All(result)
 }

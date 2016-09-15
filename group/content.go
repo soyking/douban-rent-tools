@@ -30,9 +30,9 @@ func init() {
 
 type TopicContent struct {
 	UpdateTime time.Time `json:"update_time" bson:"update_time"`
-	Content    string    `json:"content" bson:"content"`
+	Content    string    `json:"content,omitempty" bson:"content"`
 	WithPic    bool      `json:"with_pic" bson:"with_pic"`
-	PicURLs    []string  `json:"pic_urls" bson:"pic_urls"`
+	PicURLs    []string  `json:"pic_urls,omitempty" bson:"pic_urls"`
 	Like       int       `json:"like" bson:"like"`
 }
 
