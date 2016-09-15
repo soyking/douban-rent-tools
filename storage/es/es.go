@@ -179,6 +179,10 @@ func (e *ElasticSearchStorage) Query(r *storage.QueryRequest) (int, []group.Topi
 		searchService = searchService.From(from).Size(r.Size)
 	}
 
+	fsc := elastic.NewFetchSourceContext(true)
+	fsc.Exclude("topic_content.content", "topic_content.pic_urls")
+	searchService.FetchSourceContext(fsc)
+
 	result, err := searchService.Do()
 	if err != nil {
 		return 0, nil, err
