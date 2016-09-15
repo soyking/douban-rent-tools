@@ -197,6 +197,7 @@ func (e *ElasticSearchStorage) Query(r *storage.QueryRequest) (int, []group.Topi
 			return 0, nil, err
 		}
 
+		topic.URL = result.Hits.Hits[i].Id
 		topics = append(topics, *topic)
 	}
 

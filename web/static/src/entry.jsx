@@ -90,6 +90,9 @@ const Root = React.createClass({
 
   formatDate(date){
     if (!date) {return null}
+    if (!date.endsWith("Z")){
+      date.replace("Z","+08:00")
+    }
     let d = new Date(date)
     d.setTime( d.getTime() + d.getTimezoneOffset()*60*1000 )
     return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getUTCDate()+" "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()
