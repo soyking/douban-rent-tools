@@ -10,9 +10,25 @@ type FilterFunc func(*group.Topic) bool
 
 // 过滤中介用户等
 func AuthorFilter(authors []string) FilterFunc {
+	filterAuthors := []string{}
+	filterAuthorURLs := []string{}
+	for _, author := range authors {
+		// 过滤用户可以是名字也可以是地址，豆瓣用户名不全站唯一
+		if strings.HasPrefix(author, "http") {
+			filterAuthorURLs = append(filterAuthorURLs, author)
+		} else {
+			filterAuthors = append(filterAuthors, author)
+		}
+	}
+
 	return func(t *group.Topic) bool {
-		for _, author := range authors {
+		for _, author := range filterAuthors {
 			if t.Author == author {
+				return false
+			}
+		}
+		for _, authorURL := range filterAuthorURLs {
+			if t.AuthorURL == authorURL {
 				return false
 			}
 		}

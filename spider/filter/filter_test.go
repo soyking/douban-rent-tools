@@ -8,11 +8,14 @@ import (
 
 func TestAuthorFilter(t *testing.T) {
 	topic := &group.Topic{
-		Author: "soyking",
+		Author:    "soyking",
+		AuthorURL: "https://www.douban.com/people/123/",
 	}
 
 	if AuthorFilter([]string{"soyking"})(topic) {
 		t.Error("should not pass")
+	} else if AuthorFilter([]string{"https://www.douban.com/people/123/"})(topic) {
+		t.Error("should pass")
 	} else if !AuthorFilter([]string{"soyking2"})(topic) {
 		t.Error("should pass")
 	}
