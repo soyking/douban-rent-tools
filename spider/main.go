@@ -1,5 +1,11 @@
 package main
 
+import (
+	"github.com/soyking/douban-rent-tools/spider/flag"
+	"github.com/soyking/douban-rent-tools/spider/task"
+	"log"
+)
+
 const (
 	APP_NAME    = "DOUBAN RENT TOOLS - SPIDER"
 	APP_VERSION = "0.0.1"
@@ -7,6 +13,12 @@ const (
 
 func main() {
 	println(APP_NAME + "\t" + APP_VERSION)
-	initStorage()
-	runTask()
+
+	f := flag.ParseFlag()
+	task, err := task.NewTask(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	task.Run()
 }
