@@ -1,4 +1,4 @@
-package main
+package flag
 
 import (
 	"flag"
@@ -41,30 +41,33 @@ const (
 	FLAG_MONGO_DATABASE_USAGE   = "MongoDB database"
 )
 
-var (
-	port string
+type Flag struct {
+	Port string
 
-	esAddr  string
-	esIndex string
+	EsAddr  string
+	EsIndex string
 
-	mongoDBOn       bool
-	mongoDBAddr     string
-	mongoDBUsername string
-	mongoDBPassword string
-	mongoDBDatabase string
-)
+	MongoDBOn       bool
+	MongoDBAddr     string
+	MongoDBUsername string
+	MongoDBPassword string
+	MongoDBDatabase string
+}
 
-func init() {
-	flag.StringVar(&port, FLAG_PORT_NAME, FLAG_PORT_DEFAULT, FLAG_PORT_USAGE)
+func ParseFlag() *Flag {
+	f := new(Flag)
 
-	flag.StringVar(&esAddr, FLAG_ES_ADDR_NAME, FLAG_ES_ADDR_DEFAULT, FLAG_ES_ADDR_USAGE)
-	flag.StringVar(&esIndex, FLAG_ES_INDEX_NAME, FLAG_ES_INDEX_DEFAULT, FLAG_ES_INDEX_USAGE)
+	flag.StringVar(&f.Port, FLAG_PORT_NAME, FLAG_PORT_DEFAULT, FLAG_PORT_USAGE)
 
-	flag.BoolVar(&mongoDBOn, FLAG_USE_MONGO_NAME, FLAG_USE_MONGO_DEFAULT, FLAG_USE_MONGO_USAGE)
-	flag.StringVar(&mongoDBAddr, FLAG_MONGO_ADDR_NAME, FLAG_MONGO_ADDR_DEFAULT, FLAG_MONGO_ADDR_USAGE)
-	flag.StringVar(&mongoDBUsername, FLAG_MONGO_USERNAME_NAME, FLAG_MONGO_USERNAME_DEFAULT, FLAG_MONGO_USERNAME_USAGE)
-	flag.StringVar(&mongoDBPassword, FLAG_MONGO_PASSWORD_NAME, FLAG_MONGO_PASSWORD_DEFAULT, FLAG_MONGO_PASSWORD_USAGE)
-	flag.StringVar(&mongoDBDatabase, FLAG_MONGO_DATABASE_NAME, FLAG_MONGO_DATABASE_DEFAULT, FLAG_MONGO_DATABASE_USAGE)
+	flag.StringVar(&f.EsAddr, FLAG_ES_ADDR_NAME, FLAG_ES_ADDR_DEFAULT, FLAG_ES_ADDR_USAGE)
+	flag.StringVar(&f.EsIndex, FLAG_ES_INDEX_NAME, FLAG_ES_INDEX_DEFAULT, FLAG_ES_INDEX_USAGE)
+
+	flag.BoolVar(&f.MongoDBOn, FLAG_USE_MONGO_NAME, FLAG_USE_MONGO_DEFAULT, FLAG_USE_MONGO_USAGE)
+	flag.StringVar(&f.MongoDBAddr, FLAG_MONGO_ADDR_NAME, FLAG_MONGO_ADDR_DEFAULT, FLAG_MONGO_ADDR_USAGE)
+	flag.StringVar(&f.MongoDBUsername, FLAG_MONGO_USERNAME_NAME, FLAG_MONGO_USERNAME_DEFAULT, FLAG_MONGO_USERNAME_USAGE)
+	flag.StringVar(&f.MongoDBPassword, FLAG_MONGO_PASSWORD_NAME, FLAG_MONGO_PASSWORD_DEFAULT, FLAG_MONGO_PASSWORD_USAGE)
+	flag.StringVar(&f.MongoDBDatabase, FLAG_MONGO_DATABASE_NAME, FLAG_MONGO_DATABASE_DEFAULT, FLAG_MONGO_DATABASE_USAGE)
 
 	flag.Parse()
+	return f
 }

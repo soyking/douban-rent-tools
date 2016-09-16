@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/soyking/douban-rent-tools/group"
+import "github.com/soyking/douban-group-spider/group"
 
 type QueryRequest struct {
 	Page              int      `json:"page"`
@@ -11,10 +11,6 @@ type QueryRequest struct {
 	ToUpdateTime      int64    `json:"to_update_time"`
 	FromLastReplyTime int64    `json:"from_last_reply_time"`
 	ToLastReplyTime   int64    `json:"to_last_reply_time"`
-}
-
-type StorageSave interface {
-	Save([]*group.Topic) error
 }
 
 type StorageQuery interface {

@@ -2,7 +2,8 @@ package es
 
 import (
 	"encoding/json"
-	"github.com/soyking/douban-rent-tools/group"
+	"errors"
+	"github.com/soyking/douban-group-spider/group"
 	"github.com/soyking/douban-rent-tools/storage"
 	"gopkg.in/olivere/elastic.v3"
 	"strings"
@@ -11,6 +12,10 @@ import (
 
 const (
 	TOPIC_TYPE = "topic"
+)
+
+var (
+	ErrorIndexNotExist = errors.New("index not exist, please check")
 )
 
 type ElasticSearchStorage struct {
@@ -30,39 +35,13 @@ func NewElasticSearchStorage(addr, index string) (*ElasticSearchStorage, error) 
 	}
 
 	if !exist {
-		_, err := client.CreateIndex(index).Do()
-		if err != nil {
-			return nil, err
-		}
-		// mapping
-		_, err = client.PutMapping().Index(index).Type(TOPIC_TYPE).BodyString(mappings).Do()
-		if err != nil {
-			return nil, err
-		}
+		return nil, ErrorIndexNotExist
 	}
 
 	return &ElasticSearchStorage{
 		client: client,
 		index:  index,
 	}, nil
-}
-
-func (e *ElasticSearchStorage) Save(topics []*group.Topic) error {
-	bulkService := e.client.Bulk()
-	for _, topic := range topics {
-		id := topic.URL
-		topic.URL = ""
-		topicIndex := elastic.
-			NewBulkIndexRequest().
-			Index(e.index).
-			Type(TOPIC_TYPE).
-			Id(id).
-			Doc(topic)
-		bulkService.Add(topicIndex)
-	}
-	_, err := bulkService.Do()
-
-	return err
 }
 
 /*

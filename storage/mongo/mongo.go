@@ -35,25 +35,6 @@ func NewMongoDBHandler(addr, username, password, database, collection string) (*
 	}, nil
 }
 
-func (m *MongoDBHandler) BulkUpsert(pairs ...interface{}) (*mgo.BulkResult, error) {
-	sess := m.session.Copy()
-	defer sess.Close()
-	bulk := sess.DB(m.database).C(m.collection).Bulk()
-	bulk.Upsert(pairs...)
-	return bulk.Run()
-}
-
-func (m *MongoDBHandler) EnsureIndex(keys ...string) error {
-	sess := m.session.Copy()
-	defer sess.Close()
-	return sess.DB(m.database).C(m.collection).EnsureIndex(
-		mgo.Index{
-			Key:        keys,
-			Background: true,
-		},
-	)
-}
-
 func (m *MongoDBHandler) FindAll(query, selector interface{}, page, size int, result interface{}, sortedBy ...string) (int, error) {
 	sess := m.session.Copy()
 	defer sess.Close()

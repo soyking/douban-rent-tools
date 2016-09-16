@@ -25,6 +25,4 @@ _testmain.go
 *.test
 *.prof
 
-douban-rent-spider
-spider/spider
-web/web
+douban-rent-tools

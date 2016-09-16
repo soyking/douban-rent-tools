@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"github.com/soyking/douban-rent-tools/group"
+	"github.com/soyking/douban-group-spider/group"
 	"github.com/soyking/douban-rent-tools/storage"
 	"gopkg.in/mgo.v2/bson"
 	"time"
@@ -21,15 +21,6 @@ func NewMongoDBStorage(addr, username, password, database string) (*MongoDBStora
 		return nil, err
 	}
 	return &MongoDBStorage{m}, nil
-}
-
-func (m *MongoDBStorage) Save(topics []*group.Topic) error {
-	pairs := []interface{}{}
-	for i := range topics {
-		pairs = append(pairs, bson.M{"_id": topics[i].URL}, topics[i])
-	}
-	_, err := m.mongoDBHandler.BulkUpsert(pairs...)
-	return err
 }
 
 const ANY = ".*"

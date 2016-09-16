@@ -1,14 +1,14 @@
-package task
+package router
 
 import (
-	"github.com/soyking/douban-rent-tools/spider/flag"
+	"github.com/soyking/douban-rent-tools/flag"
 	"github.com/soyking/douban-rent-tools/storage"
 	"github.com/soyking/douban-rent-tools/storage/es"
 	"github.com/soyking/douban-rent-tools/storage/mongo"
 )
 
-func NewStorage(f *flag.Flag) (storage.StorageSave, error) {
-	var store storage.StorageSave
+func newStorage(f *flag.Flag) (storage.StorageQuery, error) {
+	var store storage.StorageQuery
 	var err error
 	if f.MongoDBOn {
 		println("STORAGE MONGODB ( " + f.MongoDBAddr + " )\n")
