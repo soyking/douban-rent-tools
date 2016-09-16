@@ -7,9 +7,14 @@ import (
 )
 
 const (
+	// ==== DOUBAN Setting ====
 	FLAG_GROUPS_NAME    = "groups"
 	FLAG_GROUPS_DEFAULT = "beijingzufang"
 	FLAG_GROUPS_USAGE   = "group name, split by ,"
+
+	FLAG_PAGES_NAME    = "pages"
+	FLAG_PAGES_DEFAULT = 1
+	FLAG_PAGES_USAGE   = "fetch pages of a group"
 
 	// ==== ElasticSearch Setting ====
 	FLAG_ES_ADDR_NAME    = "es_addr"
@@ -43,7 +48,7 @@ const (
 
 	// ==== Crawling Setting ====
 	FLAG_FREQUENCY_NAME    = "freq"
-	FLAG_FREQUENCY_DEFUALT = 60
+	FLAG_FREQUENCY_DEFAULT = 60
 	FLAG_FREQUENCY_USAGE   = "spider frequency(in second)"
 
 	FLAG_GROUPS_CONCURRENCY_NAME    = "g_con"
@@ -82,7 +87,7 @@ const (
 
 var (
 	groupNames string
-	frequency  int
+	pages      int
 
 	esAddr  string
 	esIndex string
@@ -93,6 +98,7 @@ var (
 	mongoDBPassword string
 	mongoDBDatabase string
 
+	frequency         int
 	groupsConcurrency int
 	topicsConcurrency int
 
@@ -108,7 +114,7 @@ var (
 
 func init() {
 	flag.StringVar(&groupNames, FLAG_GROUPS_NAME, FLAG_GROUPS_DEFAULT, FLAG_GROUPS_USAGE)
-	flag.IntVar(&frequency, FLAG_FREQUENCY_NAME, FLAG_FREQUENCY_DEFUALT, FLAG_FREQUENCY_USAGE)
+	flag.IntVar(&pages, FLAG_PAGES_NAME, FLAG_PAGES_DEFAULT, FLAG_PAGES_USAGE)
 
 	flag.StringVar(&esAddr, FLAG_ES_ADDR_NAME, FLAG_ES_ADDR_DEFAULT, FLAG_ES_ADDR_USAGE)
 	flag.StringVar(&esIndex, FLAG_ES_INDEX_NAME, FLAG_ES_INDEX_DEFAULT, FLAG_ES_INDEX_USAGE)
@@ -119,6 +125,7 @@ func init() {
 	flag.StringVar(&mongoDBPassword, FLAG_MONGO_PASSWORD_NAME, FLAG_MONGO_PASSWORD_DEFAULT, FLAG_MONGO_PASSWORD_USAGE)
 	flag.StringVar(&mongoDBDatabase, FLAG_MONGO_DATABASE_NAME, FLAG_MONGO_DATABASE_DEFAULT, FLAG_MONGO_DATABASE_USAGE)
 
+	flag.IntVar(&frequency, FLAG_FREQUENCY_NAME, FLAG_FREQUENCY_DEFAULT, FLAG_FREQUENCY_USAGE)
 	flag.IntVar(&groupsConcurrency, FLAG_GROUPS_CONCURRENCY_NAME, FLAG_GROUPS_CONCURRENCY_DEFAULT, FLAG_GROUPS_CONCURRENCY_USAGE)
 	flag.IntVar(&topicsConcurrency, FLAG_TOPICS_CONCURRENCY_NAME, FLAG_TOPICS_CONCURRENCY_DEFAULT, FLAG_TOPICS_CONCURRENCY_USAGE)
 
@@ -132,7 +139,7 @@ func init() {
 	flag.Parse()
 
 	if frequency <= 0 {
-		frequency = FLAG_FREQUENCY_DEFUALT
+		frequency = FLAG_FREQUENCY_DEFAULT
 	}
 	if groupsConcurrency <= 0 {
 		groupsConcurrency = FLAG_GROUPS_CONCURRENCY_DEFAULT

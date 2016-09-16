@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const PAGE_TOPICS_NUMBER = 25
+
 type Topic struct {
 	URL           string        `json:"_id,omitempty" bson:"_id"` // 作为唯一键
 	Title         string        `json:"title" bson:"title"`
@@ -20,13 +22,29 @@ type Topic struct {
 	TopicContent  *TopicContent `json:"topic_content" bson:"topic_content"`
 }
 
-func GetTopics(name string, concurrency ...int) ([]*Topic, error) {
-	doc, err := GetGroup(name)
-	if err != nil {
-		return nil, err
+// name 为豆瓣小组名，有的是拼音如 beijingzufang，有的是数字
+// pages 为每次获取页数，一页25条帖子
+// cocurrency 为并发抓取帖子时的 goroutine 数量
+func GetTopics(name string, pages int, concurrency ...int) ([]*Topic, error) {
+	if pages < 1 {
+		pages = 1
 	}
 
-	return ParseTopics(doc, concurrency...)
+	topics := []*Topic{}
+	for i := 0; i < pages; i++ {
+		doc, err := GetGroup(name, i*PAGE_TOPICS_NUMBER)
+		if err != nil {
+			return nil, err
+		}
+
+		pageTopics, err := ParseTopics(doc, concurrency...)
+		if err != nil {
+			return nil, err
+		}
+		topics = append(topics, pageTopics...)
+	}
+
+	return topics, nil
 }
 
 // 从文档树中获取 Topic

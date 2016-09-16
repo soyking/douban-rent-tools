@@ -25,7 +25,7 @@ func runTask() {
 			wg.Add(1)
 
 			go func(groupName string) {
-				topics, err := group.GetTopics(groupName, topicsConcurrency)
+				topics, err := group.GetTopics(groupName, pages, topicsConcurrency)
 				if err != nil {
 					log.Printf("\t\t[Fail] fetch group: %s err: %s\n", groupName, err.Error())
 				}
