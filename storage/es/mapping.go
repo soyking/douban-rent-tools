@@ -4,7 +4,8 @@ var mappings = `
 {
     "properties": {
         "title": {
-            "type": "string"
+            "type": "string",
+            "index": "not_analyzed"
         },
         "author_url": {
             "type": "string",
@@ -25,7 +26,8 @@ var mappings = `
                     "type": "date"
                 },
                 "content": {
-                    "type": "string"
+                    "type": "string",
+                    "index": "not_analyzed"
                 },
                 "with_pic": {
                     "type": "boolean"

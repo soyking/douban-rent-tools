@@ -66,6 +66,7 @@ func (e *ElasticSearchStorage) Save(topics []*group.Topic) error {
 }
 
 /*
+
 es query:
 
 GET db_rent/topic/_search
@@ -76,34 +77,29 @@ GET db_rent/topic/_search
     "bool": {
       "must": [
         {
-          "bool": {
-            "should": [
-              {
-                "match": {
-                  "topic_content.content": "北京 小区"
-                }
-              },
-              {
-                "match": {
-                  "title": "北京 小区"
-                }
-              }
-            ]
+          "query_string": {
+            "fields": [
+              "title",
+              "topic_content.content"
+            ],
+            "analyze_wildcard": true,
+            "default_operator": "OR",
+            "query": "*三家* *六号线*"
           }
         },
         {
           "range": {
             "last_reply_time": {
-              "gte": "2016-09-12T21:00:00",
-              "lte": "2016-09-12T22:29:00"
+              "gte": "2016-09-16T12:21:00",
+              "lte": "2016-09-16T12:21:00"
             }
           }
         },
         {
           "range": {
             "topic_content.update_time": {
-              "gte": "2016-09-11T08:00:00",
-              "lte": "2016-09-12T21:00:00"
+              "gte": "2016-09-01T08:00:00",
+              "lte": "2016-09-16T21:00:00"
             }
           }
         }
@@ -118,7 +114,6 @@ GET db_rent/topic/_search
     }
   ]
 }
-
 */
 
 func getTimeFormat(ts int64) string {
@@ -140,6 +135,8 @@ func newTimeRange(eq []elastic.Query, field string, from, to int64) []elastic.Qu
 	return append(eq, rangeQuery)
 }
 
+const WILDCARD = "*"
+
 func (e *ElasticSearchStorage) Query(r *storage.QueryRequest) (int, []group.Topic, error) {
 	searchService := e.client.Search().Index(e.index).Type(TOPIC_TYPE)
 
@@ -147,13 +144,17 @@ func (e *ElasticSearchStorage) Query(r *storage.QueryRequest) (int, []group.Topi
 	queries = newTimeRange(queries, "last_reply_time", r.FromLastReplyTime, r.ToLastReplyTime)
 	queries = newTimeRange(queries, "topic_content.update_time", r.FromUpdateTime, r.ToUpdateTime)
 	if len(r.Keywords) != 0 {
+		for i := range r.Keywords {
+			r.Keywords[i] = WILDCARD + r.Keywords[i] + WILDCARD
+		}
 		keywords := strings.Join(r.Keywords, " ")
-		// 标题 或者 帖子内容包含，bool.should
+		// 关键词查询使用 contain 式查询，所以对应的 field 设置为 not_analyzed
 		queries = append(queries,
-			elastic.NewBoolQuery().Should(
-				elastic.NewMatchQuery("title", keywords),
-				elastic.NewMatchQuery("topic_content.content", keywords),
-			),
+			elastic.NewQueryStringQuery(keywords).
+				AnalyzeWildcard(true).
+				DefaultOperator("OR").
+				Field("title").
+				Field("topic_content.content"),
 		)
 	}
 	// 时间，内容同时满足，bool.must
