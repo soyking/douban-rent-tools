@@ -3,9 +3,14 @@ package main
 import (
 	"encoding/json"
 	"github.com/soyking/douban-rent-tools/storage"
+	"github.com/soyking/douban-rent-tools/web/expand"
 	"io/ioutil"
 	"net/http"
 )
+
+var ep = expand.NewExpander().
+	AddExpand(expand.SubwayCond, expand.SubwayExpand).
+	AddExpand(expand.RoomCond, expand.RoomExpand)
 
 func writeErr(w http.ResponseWriter, err error) {
 	w.Write([]byte(`{"error":"` + err.Error() + `"}`))
@@ -35,6 +40,8 @@ func queryHandler(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err)
 		return
 	}
+
+	q.Keywords = ep.Expand(q.Keywords)
 
 	count, result, err := store.Query(q)
 	if err != nil {
