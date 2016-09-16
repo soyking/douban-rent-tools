@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-var store storage.Storage
+var store storage.StorageQuery
 
 func initStorage() {
 	var err error

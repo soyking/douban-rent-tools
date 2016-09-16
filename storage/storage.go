@@ -13,8 +13,11 @@ type QueryRequest struct {
 	ToLastReplyTime   int64    `json:"to_last_reply_time"`
 }
 
-type Storage interface {
+type StorageSave interface {
 	Save([]*group.Topic) error
+}
+
+type StorageQuery interface {
 	// 返回（总数，帖子，错误）
 	Query(r *QueryRequest) (int, []group.Topic, error)
 }
