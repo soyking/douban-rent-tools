@@ -13,13 +13,14 @@ const (
 )
 
 func main() {
+	println(APP_NAME + "\t" + APP_VERSION)
+
 	f := flag.ParseFlag()
 	err := router.InitRouter(f)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	println(APP_NAME + "\t" + APP_VERSION)
 	log.Printf("listen on " + f.Port)
 	log.Fatal(http.ListenAndServe(":"+f.Port, nil))
 }

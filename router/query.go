@@ -22,7 +22,7 @@ func writeResult(w http.ResponseWriter, count int, result interface{}) {
 	w.Write(b)
 }
 
-func queryHandler(store storage.StorageQuery,ep *expand.Expander) http.HandlerFunc {
+func queryHandler(store storage.StorageQuery, ep *expand.Expander) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		body, err := ioutil.ReadAll(r.Body)
