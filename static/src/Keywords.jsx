@@ -18,10 +18,11 @@ const Keywords = React.createClass({
   },
 
   addKeyword(e) {
-    if (e.target.value === "") {return}
+    let value = e.target.value.trim()
+    if (value === "") {return}
     let {keywords, count} = this.state
     count=count+1
-    keywords.push({index:count, value:e.target.value})
+    keywords.push({index:count, value:value})
     this.setState({count:count, keywords:keywords, input:""})
     this.onChange(keywords)
   },

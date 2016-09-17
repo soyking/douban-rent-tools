@@ -2,8 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Item, Box} from 'react-polymer-layout'
 import Keywords from './Keywords.jsx'
-import {DatePicker, Button, Table, message} from 'antd'
+import {DatePicker, Button, Table, message, Tooltip, Icon} from 'antd'
 import 'antd/dist/antd.min.css'
+
+const keywordsHint = "输入关键词并回车, 输入 地铁：4 可以查询路线上帖子, 输入 房间：2 可以查询对应房间数帖子"
 
 const columns = [{
       title: '标题',
@@ -196,6 +198,9 @@ const Root = React.createClass({
             <Box center style={{margin:"10px"}}>
               <div style={{color:"#989898", fontSize:25, marginRight:86}}>关键词</div>
               <Item flex><Keywords onChange={this.updateKeywords}/></Item>
+              <Tooltip title={keywordsHint}>
+                <Icon type="question-circle-o" style={{fontSize:20, marginLeft: 3}}/>
+              </Tooltip>
             </Box>
             <Box cneter style={{margin:"10px"}}>
               <div style={{color:"#989898", fontSize:25, marginRight:10}}>最后更新时间</div>
