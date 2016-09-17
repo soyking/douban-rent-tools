@@ -17,6 +17,7 @@
     "react-polymer-layout": "^0.2.17"
   },
   "scripts": {
-    "watch": "./node_modules/webpack/bin/webpack.js --watch"
+    "watch": "./node_modules/webpack/bin/webpack.js --watch",
+    "build": "./node_modules/webpack/bin/webpack.js"
   }
 }
