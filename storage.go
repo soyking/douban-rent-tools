@@ -1,4 +1,4 @@
-package router
+package main
 
 import (
 	"github.com/soyking/douban-rent-tools/flag"

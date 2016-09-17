@@ -27,6 +27,10 @@ func (e *Expander) AddExpand(condition Condition, expand Expand) *Expander {
 }
 
 func (e *Expander) Expand(keywords []string) []string {
+	if len(e.conditions) == 0 {
+		return keywords
+	}
+
 	expandedKeywords := []string{}
 	for _, keyword := range keywords {
 		meetCond := false

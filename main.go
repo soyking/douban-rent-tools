@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/soyking/douban-rent-tools/expand"
 	"github.com/soyking/douban-rent-tools/flag"
-	"github.com/soyking/douban-rent-tools/router"
+	"github.com/soyking/douban-rent-tools/server"
 	"log"
-	"net/http"
 )
 
 const (
@@ -16,11 +16,20 @@ func main() {
 	println(APP_NAME + "\t" + APP_VERSION)
 
 	f := flag.ParseFlag()
-	err := router.InitRouter(f)
+	store, err := newStorage(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ep := expand.NewExpander().
+		AddExpand(SubwayCond, SubwayExpand).
+		AddExpand(RoomCond, RoomExpand)
+
+	svr, err := server.NewServer(":"+f.Port, store, ep)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Printf("listen on " + f.Port)
-	log.Fatal(http.ListenAndServe(":"+f.Port, nil))
+	log.Fatal(svr.ListenAndServe())
 }

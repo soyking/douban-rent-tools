@@ -1,4 +1,4 @@
-package router
+package server
 
 import (
 	"encoding/json"
@@ -38,7 +38,9 @@ func queryHandler(store storage.StorageQuery, ep *expand.Expander) http.HandlerF
 			return
 		}
 
-		q.Keywords = ep.Expand(q.Keywords)
+		if ep != nil {
+			q.Keywords = ep.Expand(q.Keywords)
+		}
 
 		count, result, err := store.Query(q)
 		if err != nil {
